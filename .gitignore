@@ -39,7 +39,7 @@ vignettes/*.pdf
 .Renviron
 
 # Table exported from PastPerfect
-/data/tables/*.xls
+/data/tables/*.xlsx
 
 # Images from PastPerfect
 /data/Images/
