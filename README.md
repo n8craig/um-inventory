@@ -2,7 +2,7 @@
 
 This repository contains the code to build a searchable interface for museum collections that are stored in a [PastPerfect](https://museumsoftware.com/) database. A working model based on collections from the [University Museum](https://univmuseum.nmsu.edu/) of the [New Mexico State University](https://nmsu.edu/) can be found [here](https://univmuseum.nmsu.edu/pages/collections/inventory/).
 
-> **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data stored in museum databases are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository. The project only selects images that are rendered and these are resized to a max of 1000 px.
+> **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data stored in museum databases are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository.
 
 ## To use this repository:
 
