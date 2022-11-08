@@ -4,7 +4,7 @@ This repository contains the code to build a searchable interface for museum col
 
 > **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository.
 
-To use this repository:
+## To use this repository:
 
 1.  Clone the repository
 2.  Within the project root, create the following directories:
