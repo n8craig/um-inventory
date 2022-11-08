@@ -9,7 +9,7 @@ This repository contains the code to build a searchable interface for museum col
 To use this repository:
 1. Clone to local
 2. Create three directories
-  - data/
-  - data/images_full/
-  - data/images_thums/
-  - data/tables
+   - data/
+   - data/images_full/
+   - data/images_thums/
+   - data/tables
