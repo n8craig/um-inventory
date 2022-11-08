@@ -2,7 +2,7 @@
 
 This repository contains the code to build a searchable interface for museum collections that are stored in a [PastPerfect](https://museumsoftware.com/) database. A working model based on collections from the [University Museum](https://univmuseum.nmsu.edu/) of the [New Mexico State University](https://nmsu.edu/) can be found [here](https://univmuseum.nmsu.edu/pages/collections/inventory/).
 
-> **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data stored in museum databases are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository.
+> **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data stored in museum databases are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository. Users wishing to implement this tool will need to supply: 1) a PastPerfect object export file and 2) the corresponding `Images` directory from PastPerfect.
 
 ## To use this repository:
 
@@ -12,15 +12,15 @@ This repository contains the code to build a searchable interface for museum col
     -   `data/images_full/`
     -   `data/images_thums/`
     -   `data/tables`
-3.  Export the Object List from PastPerfect
-4.  Save the export output as an `.xlsx` file and place it into `./data/tables`
+3.  Export the Object List from PastPerfect following these [guidelines](https://pastperfect.zendesk.com/hc/en-us/articles/360023357934-How-do-I-export-data-from-PastPerfect-).
+4.  Save the export output as an `.xlsx` file and place it into `./data/tables` directory created above.
 5.  From PastPerfect, copy the `Images` directory into the `./data` directory such that it is `./data/Images`.
-6.  Within the `index.qmd` file, nativate to the `data-read` chunk, and find the line that reads `df <- read_excel(here::here("data/tables/EXPORTED_FILE_NAME.xlsx")) %>% janitor::clean_names()` .
+6.  Within the `index.qmd` file, navigate to the `data-read` chunk, and find the line that reads `df <- read_excel(here::here("data/tables/EXPORTED_FILE_NAME.xlsx")) %>% janitor::clean_names()` .
 7.  In this line of code, insert the name of the export file that was saved to `./data/tables` . It is suggested to use a date stamped file name like `inventory_2022_10_26.xlsx` but any name should work.
 8.  While developing the site it is recommended to sample the records. To do this, navigate to the code chunk called `df-sample` and set `eval: true` and then select the sample size under `slice_sample(n=XX)`. When you want to render the entire table, set `eval: false` for the `df-sample` code chunk.
-9.  When you want to observe the output, render the project.
-10. After rendering, it is a good idea to compress the images in the output `_site` directory. For this task, the [Caesium Image Compressor](https://saerasoft.com/caesium) is recommended (though this could also be done with `magick`). I found that JPG compression of 75 works well.
-11. After image compression, the site is ready to send to the server..
+9.  When you want to observe the output, render the project. Be prepared that large collections with lots of images may take some time. On my machine, with 16 gigs of RAM, rendering takes about an hour. This is one of the reasons that sampling is useful during the development stage.
+10. After rendering, it is a good idea to compress the images in the output `_site` directory. This will reduce the load for users and save space on the server. For this task, the [Caesium Image Compressor](https://saerasoft.com/caesium) is recommended (though this could also be done with `magick`). I found that JPG compression of 75 works well.
+11. After image compression, the site is ready to send to the server.
 12. Small projects can be posted to Quarto Pubs with the terminal command: `quarto publish quarto-pub --no-render` . If you want to re-render at publish, leave off the last argument.
 13. Larger projects can be rendered to Netlify with the terminal command: `quarto publish netlify --no-render` . If you want to re-render at publish, leave off the last argument.
 14. Alternatively, the contents of the `_site` directory can be pushed to any web server. This is what we've done with `univmuseum.nmsu.edu` .
