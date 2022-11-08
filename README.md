@@ -12,4 +12,3 @@ To use this repository:
    - data/
    - data/images_full/
    - data/images_thums/
-   - data/tables
