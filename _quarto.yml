@@ -1,0 +1,28 @@
+project:
+  type: website
+
+website:
+  title: "University Museum Inventory"
+  image: "./data/images_full/NMSU Museum Logo.png"
+  navbar:
+    background: "dark"
+    # logo: "./data/images_full/NMSU Museum Logo.png"
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+  page-footer: 
+    background: "dark"
+    right: "[NMSU University Museum](https://univmuseum.nmsu.edu/){target='_blank'}"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    # embed-resources: true
+
+
+resources: 
+       - "/data/images_full/"
+       - "/data/images_thumbs/"

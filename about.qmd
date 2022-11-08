@@ -1,0 +1,13 @@
+---
+title: "About"
+---
+
+This website is a public interface to the inventory of the permanent collection of the [University Museum](https://univmuseum.nmsu.edu/){target="_blank"} of the New Mexico State University ([NMSU](https://nmsu.edu/){target="_blank"}). The site aims to increase access of the collections for teaching, research, exhibition, collaborative outreach, and training.
+
+::: {layout-ncol="2"}
+Construction of this inventory was supported by generous support from the Institute of Museum and Library Services ([IMLS](https://www.imls.gov/){target="_blank"}) *Inspire!* Grants for Small Museums Award [IGSM-248937-OMS-21](https://www.imls.gov/grants/awarded/igsm-248937-oms-21){target="_blank"}.
+
+![](https://www.imls.gov/sites/default/files/imls_logo_2c.bmp){width="350"}
+:::
+
+The site also serves as a proof of concept that searchable interfaces to small museum collections can be built with free and open source software. This site was built with [R](https://www.r-project.org/), relies heavily on the [DataTables](https://datatables.net/) JavaScript library, its R wrapper [`DT`](https://rstudio.github.io/DT/), and the [Quarto](https://quarto.org/) publishing engine.

@@ -1,0 +1,216 @@
+---
+title: ""
+---
+
+<!-- ```{=html} -->
+<!-- <a href='\\data\\Images\\005\\6249.JPG' target = 'blank'><img src='.\\data\\Images\\005\\6249.JPG'  width = '125'></a></img> -->
+<!-- ``` -->
+
+```{r setup, echo=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(magick)
+library(DT)
+library(reactable)
+library(stringr)
+```
+
+```{r data-read}
+#| message: false
+#| warning: false
+
+# Read data
+df <- read_excel(here::here("data/tables/inventory_2022_10_26.xlsx")) %>% janitor::clean_names()
+
+# Clean columns
+source(here::here("scripts/past_perfect_clean_fields.R"))
+```
+
+```{r df-sample}
+#| eval: true
+
+#### SAMPLE MAIN DF
+
+set.seed(7575)
+
+# Sample of records with images
+df_img <- df |> drop_na(imagefile) |> 
+  slice_sample(n=200)
+
+# Sample of records without images
+df_img_na <- df |> filter(is.na(imagefile)) |> 
+  slice_sample(n = 2)
+
+# Combine to make a smaller table
+df <- rbind(df_img, df_img_na)
+```
+
+```{r images-copy}
+#| warning: false
+#| message: false
+#| echo: false
+#| results: hide
+
+
+### Clean out directory
+image_list <- list.files("./data/images_full/")
+image_list <- image_list[image_list != "NMSU Museum Logo.png"]
+file.remove(paste0("./data/images_full/", image_list))
+
+### Copy the list of files.
+file.copy(from =  paste0("./data/Images/", df$imagefile), to = here::here("./data/images_full/"))
+file.copy(from = "./data/Images/NMSU Museum Logo.png", to = "./data/images_full/", overwrite = TRUE)
+
+
+image_list <- list.files("./data/images_full/")
+
+### Get just the filename
+df$imagefile <- str_remove(df$imagefile, "\\d\\d\\d\\\\")
+
+```
+
+```{r images-resize-save}
+
+# Add relative file path to image_list
+images_full <- paste0("./data/images_full/", image_list)
+images_thumbs <- paste0("./data/images_thumbs/", image_list)
+
+# Read images to list
+images <- magick::image_read(images_full)
+
+# Resize images in list
+images <- magick::image_scale(images, "150")
+
+# Write out images
+for (i in 1:length(images)) {
+  magick::image_write(images[i], images_thumbs[i])
+}
+```
+
+```{r df-wrangle}
+
+# Select columns and lightly wrangle
+df <-  df |>
+  select(
+    c(
+      # "accessno",
+      # "cat",
+      "collection",
+      # "collector",
+      # "date",
+      # "descrip", # Past Perfect Description
+      # "homeloc",
+      "imagefile",
+      # "imageno",
+      "material",
+      # "notes",
+      "objectid",
+      "objname",
+      "otherno",
+      "udf1",
+      "udf3",
+      "udf8",
+      "udf9",
+      "udf10",
+      "udf21" # University Museum Description
+    )
+  ) |>
+  relocate(objectid) |>
+  rename(
+    "object" = "objname",
+    "other name" = "otherno",
+    "culture" = "udf1",
+    "source" = "udf3",
+    "country" = "udf8",
+    "state" = "udf9",
+    "locale" = "udf10",
+    "description" = "udf21"
+  ) |>
+  relocate(source, .before = culture) |>
+  
+  
+  # To display images inside DT they must be in HTML tags
+  mutate(
+    imagefile = paste0(
+      "<a href='./data/images_full/",
+      imagefile,
+      "' target = '_blank' rel='noreferrer noopener'>",
+      "<img src='./data/images_thumbs/",
+      imagefile,
+      "'  width = '125'></a></img>"
+    )
+  ) |>
+  
+  mutate(
+    imagefile = na_if(
+      imagefile,
+      "<a href='./data/images_full/NA' target = '_blank' rel='noreferrer noopener'><img src='./data/images_full/NA'  width = '125'></a></img>"
+    )
+  ) |>
+  
+  
+  mutate(
+    imagefile =  str_replace_all(
+      string = imagefile,
+      pattern = "images_full/NA",
+      replacement = "images_full/NMSU Museum Logo.png"
+    ))|>
+  mutate(
+    imagefile =     str_replace_all(
+      string = imagefile,
+      pattern = "images_thumbs/NA",
+      replacement = "images_thumbs/NMSU Museum Logo.png"
+  )) |> 
+  
+  filter(!grepl("SC2014|SC2009", objectid)) |> # remove skull casts
+  filter(!is.na(objectid))
+
+```
+
+
+
+
+::: {.callout-note collapse="true"}
+## Inventory Interface Instructions
+
+-   To query the entire table use the Search box in the upper right.
+-   To query by an individual column use the box below the column name.
+-   To sort by a column, click on its header.
+-   To expand the data for a record, click the green "+" next to the objectid.
+-   To change column visibility, use the dropdown menu on the left.
+-   To copy data from the table, use the buttons corresponding to one of three formats: copy to the clipboard or save the file as either `csv` or `.xlsx`.
+
+![](https://i.imgur.com/K7T48NF.png)
+:::
+
+```{r df-show-dt}
+#| column: screen-inset
+#| warning: false
+#| message: false
+#| error: false
+
+datatable(df,
+
+          escape = FALSE,
+          rownames = FALSE,
+          filter = "top",
+          extensions = c("Buttons", "Responsive"),
+          # selection = "none",
+          options = list(
+            # pageLength = 10,
+            # lengthMenu = c(10, 25, 50, 10),
+            dom = "Bflrtip",
+            buttons = c("colvis", "copy", "csv", "excel")
+          )
+          )
+
+```

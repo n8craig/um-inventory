@@ -1,0 +1,7 @@
+- source: project
+  quarto-pub:
+    - id: edc1096b-74eb-46be-a16d-ec7a53079192
+      url: 'https://quartopub.com/sites/nmc/university-museum-inventory'
+  netlify:
+    - id: 18e61c0b-1cb8-48cf-bdab-4c3d95ddf3cc
+      url: 'https://animated-duckanoo-a90256.netlify.app'
