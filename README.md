@@ -1,6 +1,6 @@
 # um-inventory: University Museum Collections Inventory
 
-This repository contains the code to build a searchable interface for museum collections that are stored in a [PastPerfect](https://museumsoftware.com/){target="_blank"} database.
+This repository contains the code to build a searchable interface for museum collections that are stored in a [PastPerfect](https://museumsoftware.com/) database. A working model can be found [here](https://univmuseum.nmsu.edu/pages/collections/inventory/).
 
 > **Note** Several key parts of the project data are not included in this repository. There are two reasons for this: 1) some of the data are sensitive and not appropriate for public display, 2) the original uncompressed images are large and would clutter the repository.
 
@@ -22,4 +22,4 @@ To use this repository:
 10. Small projects can be rendered to Quarto Pubs with the terminal command: `quarto publish quarto-pub` .
 11. Larger projects can be rendered to Netlify with the terminal command: `quarto publish netlify` .
 12. Alternatively, the contents of the `_site` directory can be pushed to any web server.
-13. Further customization options are documented at [Quarto](https://quarto.org/){target="_blank"} and [`DT`](https://rstudio.github.io/DT/){target="_blank"}.
+13. Further customization options are documented at [Quarto](https://quarto.org/) and [`DT`](https://rstudio.github.io/DT/).
