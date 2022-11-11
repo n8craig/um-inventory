@@ -22,7 +22,6 @@ format:
     toc: true
     # embed-resources: true
 
-
 resources: 
        - "/data/images_full/"
        - "/data/images_thumbs/"
