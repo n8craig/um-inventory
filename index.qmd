@@ -2,9 +2,6 @@
 title: ""
 ---
 
-<!-- ```{=html} -->
-<!-- <a href='\\data\\Images\\005\\6249.JPG' target = 'blank'><img src='.\\data\\Images\\005\\6249.JPG'  width = '125'></a></img> -->
-<!-- ``` -->
 
 ```{r setup, echo=FALSE}
 
@@ -29,7 +26,7 @@ library(stringr)
 #| warning: false
 
 # Read data
-df <- read_excel(here::here("data/tables/inventory_2022_10_26.xlsx")) %>% janitor::clean_names()
+df <- read_excel(here::here("data/tables/inventory_2022_11_18.xlsx")) %>% janitor::clean_names()
 
 # Clean columns
 source(here::here("scripts/past_perfect_clean_fields.R"))
@@ -44,7 +41,7 @@ set.seed(7575)
 
 # Sample of records with images
 df_img <- df |> drop_na(imagefile) |> 
-  slice_sample(n=200)
+  slice_sample(n=100)
 
 # Sample of records without images
 df_img_na <- df |> filter(is.na(imagefile)) |> 
@@ -180,16 +177,46 @@ df <-  df |>
 
 
 ::: {.callout-note collapse="true"}
-## Inventory Interface Instructions
+## Click for Instructions
 
--   To query the entire table use the Search box in the upper right.
--   To query by an individual column use the box below the column name.
--   To sort by a column, click on its header.
--   To expand the data for a record, click the green "+" next to the objectid.
--   To change column visibility, use the dropdown menu on the left.
--   To copy data from the table, use the buttons corresponding to one of three formats: copy to the clipboard or save the file as either `csv` or `.xlsx`.
+:::{layout-ncol=2}
 
-![](https://i.imgur.com/K7T48NF.png)
+The University Museum inventory user interface is divided into an upper and lower portion. The upper portion is for filtering and downloading data. The lower portion is for navigation and provides additional filtering functions. Click on the tab below to toggle the instructions for the Upper and Lower portions of the inventory interface.
+
+![](https://i.imgur.com/iHdy1CW.png){fig-align="center"}
+
+:::
+
+::: {.panel-tabset}
+
+## Upper Portion
+
+The Upper Portion contains tools for filtering the table.
+
+![](https://i.imgur.com/vLDaAqB.png)
+
+1. This heading represents the field name that the filter tool works on. Under the field name, there is a list of field values. Click on a field value to filter the table. The number of filtered records will appear (see item 8).
+2. Click the `X` to remove all of the filters for that field.
+3. The `#↕` tool can be used to sort field values by the number of records corresponding to that value. This can be useful to see which values have more records. The adjacent `A↕` tool can be used to sort terms alphabetically.
+4. These links allow one to collapse or expand the Upper Portion filtering tools.
+5. This box is a global search tool allowing one to search a given value across all fields in the table.
+6. This drop-down allows one change the number of records displayed at one time.
+7. These buttons allow one to download the table in the following formats: copy to clipboard, `csv` and `xlsx`.
+8. This readout reports the total number of records in the inventory and indicates how many records are filtered.
+
+## Lower Portion
+
+The Lower Portion contains tools for column level filtering and record browsing.
+
+![](https://i.imgur.com/RlYSo0I.png)
+
+1. These input boxes are used for filtering within a field. These can be useful for quick searches. Users may prefer to use the Upper Portion filtering tools for `collection`, `culture`, and `country`.
+2. Field headings allow for ascending and descending sorting. Click on the field name to sort, click again to reverse sort.
+3. On smaller displays, table records are automatically collapsed. When records are collapsed, a green `+` appears. Click the green `+` to expand a collapsed record.
+4. Click on image thumbnails to see larger versions of the object photographs. Images open in a new tab.
+
+:::
+
 :::
 
 ```{r df-show-dt}
@@ -197,20 +224,31 @@ df <-  df |>
 #| warning: false
 #| message: false
 #| error: false
+#| eval: true
 
-datatable(df,
-
-          escape = FALSE,
-          rownames = FALSE,
-          filter = "top",
-          extensions = c("Buttons", "Responsive"),
-          # selection = "none",
-          options = list(
-            # pageLength = 10,
-            # lengthMenu = c(10, 25, 50, 10),
-            dom = "Bflrtip",
-            buttons = c("colvis", "copy", "csv", "excel")
-          )
-          )
+# Existing working model
+datatable(
+  df,
+  escape = FALSE,
+  rownames = FALSE,
+  filter = "top",
+  options = list(
+    dom = 'PBflritip',
+    buttons = c("colvis", "copy", "csv", "excel"),
+    columnDefs = list(
+      list(
+        searchPanes = list(show = FALSE),
+        targets = c(0, 2:6, 9:10),
+        searchPanes = list(show = TRUE, initCollapsed = TRUE),
+        targets = c(1 , 7:8)
+      )
+    )
+  ),
+  extensions = c('Select', 'SearchPanes', "Buttons", "Responsive"),
+  selection = 'none'
+)
 
 ```
+
+
+
