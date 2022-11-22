@@ -33,7 +33,7 @@ source(here::here("scripts/past_perfect_clean_fields.R"))
 ```
 
 ```{r df-sample}
-#| eval: true
+#| eval: false
 
 #### SAMPLE MAIN DF
 
@@ -41,7 +41,7 @@ set.seed(7575)
 
 # Sample of records with images
 df_img <- df |> drop_na(imagefile) |> 
-  slice_sample(n=100)
+  slice_sample(n=300)
 
 # Sample of records without images
 df_img_na <- df |> filter(is.na(imagefile)) |> 
@@ -174,50 +174,47 @@ df <-  df |>
 ```
 
 
-
-
 ::: {.callout-note collapse="true"}
 ## Click for Instructions
 
-:::{layout-ncol=2}
+-   The inventory offers a number of tools to interact with the data (@fig-general-layout). The simplest is the global `Search` box. This allows for searching across all columns of the table. To the left, there is a more highly controlled `Search Builder`. Below this, `Search Results` are reported and there are buttons for `Data Download` and use in other applications.
 
-The University Museum inventory user interface is divided into an upper and lower portion. The upper portion is for filtering and downloading data. The lower portion is for navigation and provides additional filtering functions. Click on the tab below to toggle the instructions for the Upper and Lower portions of the inventory interface.
+![General layout of search tools.](https://i.imgur.com/Yq7A8Mh.png){#fig-general-layout}
 
-![](https://i.imgur.com/iHdy1CW.png){fig-align="center"}
+:::{layout-ncol=2 layout-valign="center"}
 
-:::
+-   To set a filter in the `Search Builder`, click on the `Add Condition` button (@fig-add-condition). This brings up the condition statement builder which is composed of three key parts: `Data`, `Condition`, and `Value`.
 
-::: {.panel-tabset}
+![The `Add Condition` button.](https://i.imgur.com/C9UVsqY.png){#fig-add-condition}
 
-## Upper Portion
 
-The Upper Portion contains tools for filtering the table.
+-   The `Data` button determines which field one will use for filtering (@fig-data-button). Use the drop down list from this button to select the desired field for filtering.
 
-![](https://i.imgur.com/vLDaAqB.png)
+![Data button showing inventory field names.](https://i.imgur.com/PCf5gYp.png){#fig-data-button}
 
-1. This heading represents the field name that the filter tool works on. Under the field name, there is a list of field values. Click on a field value to filter the table. The number of filtered records will appear (see item 8).
-2. Click the `X` to remove all of the filters for that field.
-3. The `#↕` tool can be used to sort field values by the number of records corresponding to that value. This can be useful to see which values have more records. The adjacent `A↕` tool can be used to sort terms alphabetically.
-4. These links allow one to collapse or expand the Upper Portion filtering tools.
-5. This box is a global search tool allowing one to search a given value across all fields in the table.
-6. This drop-down allows one change the number of records displayed at one time.
-7. These buttons allow one to download the table in the following formats: copy to clipboard, `csv` and `xlsx`.
-8. This readout reports the total number of records in the inventory and indicates how many records are filtered.
 
-## Lower Portion
+-   The `Condition` button determines the nature of the search operator (@fig-condition-button). There are many options, and each functions differently. The `Exact` argument gives narrow searches while arguments like `Contains` or `Starts With` offer more inclusive searches. Users are encouraged to experiment with different search arguments to see which best fits their needs.
 
-The Lower Portion contains tools for column level filtering and record browsing.
+![`Condition` button showing different kinds of operators.](https://i.imgur.com/bvnuonO.png){#fig-condition-button}
 
-![](https://i.imgur.com/RlYSo0I.png)
+-   If `Condition` is set to `Equals` then the `Value` field lists all possible entries in the selected `Data` column (@fig-condition-equals). Thus, `Equals` sets conditions for exact matches to particular field values. This can be useful for searching the `collection`, or `object` fields.
 
-1. These input boxes are used for filtering within a field. These can be useful for quick searches. Users may prefer to use the Upper Portion filtering tools for `collection`, `culture`, and `country`.
-2. Field headings allow for ascending and descending sorting. Click on the field name to sort, click again to reverse sort.
-3. On smaller displays, table records are automatically collapsed. When records are collapsed, a green `+` appears. Click the green `+` to expand a collapsed record.
-4. Click on image thumbnails to see larger versions of the object photographs. Images open in a new tab.
+![Illustrating values returned when `Condition` is set to `Equals`.](https://i.imgur.com/08uRoU6.png){#fig-condition-equals}
+
+-   If `Condition` is set to `Contains` then the `Value` field is set to blank and it will return records from the target `Data` field that match the string a user enters into the `Value` field (@fig-condition-contains). This can be useful for casting the net wide. For example, if `Data` is set to the field `culture` and `Condition` is set to `Contains` and a user enters the word `Pueblo` into `Value` field the search builder will return records that include words like "Ancestral Pueblo", "Acoma Pueblo", "Jimez Pueblo", etc.
+
+![Illustrating when `Condition` is set to `Contains` and search strings are applied to `Value`](https://i.imgur.com/w1z6AzC.png){#fig-condition-contains}
+
+-   It is possible to string multiple query statements together by adding additional conditions (@fig-operator-logic). Additional conditions can be set to use either `And` or `Or` logic. The type of logical operator can be toggled from `And` to `Or` by clicking on the button.
+
+![Illustrating how to alter logical operators for multi condition searchs.](https://i.imgur.com/yQtTTLf.png){#fig-operator-logic}
 
 :::
 
+-   Click an associated `X` to clear a search condition.
+
 :::
+
 
 ```{r df-show-dt}
 #| column: screen-inset
@@ -231,9 +228,9 @@ datatable(
   df,
   escape = FALSE,
   rownames = FALSE,
-  filter = "top",
+  # filter = "top",
   options = list(
-    dom = 'PBflritip',
+    dom = 'QflriBtip',
     buttons = c("colvis", "copy", "csv", "excel"),
     columnDefs = list(
       list(
@@ -244,7 +241,7 @@ datatable(
       )
     )
   ),
-  extensions = c('Select', 'SearchPanes', "Buttons", "Responsive"),
+  extensions = c('Select', 'SearchPanes', "DateTime", "Buttons", "Responsive", "SearchBuilder"),
   selection = 'none'
 )
 
