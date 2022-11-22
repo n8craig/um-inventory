@@ -1,0 +1,254 @@
+---
+title: ""
+---
+
+
+```{r setup, echo=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(magick)
+library(DT)
+library(reactable)
+library(stringr)
+```
+
+```{r data-read}
+#| message: false
+#| warning: false
+
+# Read data
+df <- read_excel(here::here("data/tables/inventory_2022_11_18.xlsx")) %>% janitor::clean_names()
+
+# Clean columns
+source(here::here("scripts/past_perfect_clean_fields.R"))
+```
+
+```{r df-sample}
+#| eval: true
+
+#### SAMPLE MAIN DF
+
+set.seed(7575)
+
+# Sample of records with images
+df_img <- df |> drop_na(imagefile) |> 
+  slice_sample(n=100)
+
+# Sample of records without images
+df_img_na <- df |> filter(is.na(imagefile)) |> 
+  slice_sample(n = 2)
+
+# Combine to make a smaller table
+df <- rbind(df_img, df_img_na)
+```
+
+```{r images-copy}
+#| warning: false
+#| message: false
+#| echo: false
+#| results: hide
+
+
+### Clean out directory
+image_list <- list.files("./data/images_full/")
+image_list <- image_list[image_list != "NMSU Museum Logo.png"]
+file.remove(paste0("./data/images_full/", image_list))
+
+### Copy the list of files.
+file.copy(from =  paste0("./data/Images/", df$imagefile), to = here::here("./data/images_full/"))
+file.copy(from = "./data/Images/NMSU Museum Logo.png", to = "./data/images_full/", overwrite = TRUE)
+
+
+image_list <- list.files("./data/images_full/")
+
+### Get just the filename
+df$imagefile <- str_remove(df$imagefile, "\\d\\d\\d\\\\")
+
+```
+
+```{r images-resize-save}
+
+# Add relative file path to image_list
+images_full <- paste0("./data/images_full/", image_list)
+images_thumbs <- paste0("./data/images_thumbs/", image_list)
+
+# Read images to list
+images <- magick::image_read(images_full)
+
+# Resize images in list
+images <- magick::image_scale(images, "150")
+
+# Write out images
+for (i in 1:length(images)) {
+  magick::image_write(images[i], images_thumbs[i])
+}
+```
+
+```{r df-wrangle}
+
+# Select columns and lightly wrangle
+df <-  df |>
+  select(
+    c(
+      # "accessno",
+      # "cat",
+      "collection",
+      # "collector",
+      # "date",
+      # "descrip", # Past Perfect Description
+      # "homeloc",
+      "imagefile",
+      # "imageno",
+      "material",
+      # "notes",
+      "objectid",
+      "objname",
+      "otherno",
+      "udf1",
+      "udf3",
+      "udf8",
+      "udf9",
+      "udf10",
+      "udf21" # University Museum Description
+    )
+  ) |>
+  relocate(objectid) |>
+  rename(
+    "object" = "objname",
+    "other name" = "otherno",
+    "culture" = "udf1",
+    "source" = "udf3",
+    "country" = "udf8",
+    "state" = "udf9",
+    "locale" = "udf10",
+    "description" = "udf21"
+  ) |>
+  relocate(source, .before = culture) |>
+  
+  
+  # To display images inside DT they must be in HTML tags
+  mutate(
+    imagefile = paste0(
+      "<a href='./data/images_full/",
+      imagefile,
+      "' target = '_blank' rel='noreferrer noopener'>",
+      "<img src='./data/images_thumbs/",
+      imagefile,
+      "'  width = '125'></a></img>"
+    )
+  ) |>
+  
+  mutate(
+    imagefile = na_if(
+      imagefile,
+      "<a href='./data/images_full/NA' target = '_blank' rel='noreferrer noopener'><img src='./data/images_full/NA'  width = '125'></a></img>"
+    )
+  ) |>
+  
+  
+  mutate(
+    imagefile =  str_replace_all(
+      string = imagefile,
+      pattern = "images_full/NA",
+      replacement = "images_full/NMSU Museum Logo.png"
+    ))|>
+  mutate(
+    imagefile =     str_replace_all(
+      string = imagefile,
+      pattern = "images_thumbs/NA",
+      replacement = "images_thumbs/NMSU Museum Logo.png"
+  )) |> 
+  
+  filter(!grepl("SC2014|SC2009", objectid)) |> # remove skull casts
+  filter(!is.na(objectid))
+
+```
+
+
+
+
+::: {.callout-note collapse="true"}
+## Click for Instructions
+
+:::{layout-ncol=2}
+
+The University Museum inventory user interface is divided into an upper and lower portion. The upper portion is for filtering and downloading data. The lower portion is for navigation and provides additional filtering functions. Click on the tab below to toggle the instructions for the Upper and Lower portions of the inventory interface.
+
+![](https://i.imgur.com/iHdy1CW.png){fig-align="center"}
+
+:::
+
+::: {.panel-tabset}
+
+## Upper Portion
+
+The Upper Portion contains tools for filtering the table.
+
+![](https://i.imgur.com/vLDaAqB.png)
+
+1. This heading represents the field name that the filter tool works on. Under the field name, there is a list of field values. Click on a field value to filter the table. The number of filtered records will appear (see item 8).
+2. Click the `X` to remove all of the filters for that field.
+3. The `#↕` tool can be used to sort field values by the number of records corresponding to that value. This can be useful to see which values have more records. The adjacent `A↕` tool can be used to sort terms alphabetically.
+4. These links allow one to collapse or expand the Upper Portion filtering tools.
+5. This box is a global search tool allowing one to search a given value across all fields in the table.
+6. This drop-down allows one change the number of records displayed at one time.
+7. These buttons allow one to download the table in the following formats: copy to clipboard, `csv` and `xlsx`.
+8. This readout reports the total number of records in the inventory and indicates how many records are filtered.
+
+## Lower Portion
+
+The Lower Portion contains tools for column level filtering and record browsing.
+
+![](https://i.imgur.com/RlYSo0I.png)
+
+1. These input boxes are used for filtering within a field. These can be useful for quick searches. Users may prefer to use the Upper Portion filtering tools for `collection`, `culture`, and `country`.
+2. Field headings allow for ascending and descending sorting. Click on the field name to sort, click again to reverse sort.
+3. On smaller displays, table records are automatically collapsed. When records are collapsed, a green `+` appears. Click the green `+` to expand a collapsed record.
+4. Click on image thumbnails to see larger versions of the object photographs. Images open in a new tab.
+
+:::
+
+:::
+
+```{r df-show-dt}
+#| column: screen-inset
+#| warning: false
+#| message: false
+#| error: false
+#| eval: true
+
+# Existing working model
+datatable(
+  df,
+  escape = FALSE,
+  rownames = FALSE,
+  filter = "top",
+  options = list(
+    dom = 'PBflritip',
+    buttons = c("colvis", "copy", "csv", "excel"),
+    columnDefs = list(
+      list(
+        searchPanes = list(show = FALSE),
+        targets = c(0, 2:6, 9:10),
+        searchPanes = list(show = TRUE, initCollapsed = TRUE),
+        targets = c(1 , 7:8)
+      )
+    )
+  ),
+  extensions = c('Select', 'SearchPanes', "Buttons", "Responsive"),
+  selection = 'none'
+)
+
+```
+
+
+
